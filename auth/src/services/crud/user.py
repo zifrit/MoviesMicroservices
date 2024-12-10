@@ -47,7 +47,7 @@ async def get_active_user_by_uuid(session: AsyncSession, uuid: UUID = Path()) ->
     return user if user else RaiseHttpException.check_is_exist(user)
 
 
-async def get_user_by_uuid(uuid: str, session: AsyncSession) -> User:
+async def get_user_by_uuid(session: AsyncSession, uuid: UUID = Path()) -> User:
     user = await session.scalar(select(User).where(User.id == uuid))
     return user if user else RaiseHttpException.check_is_exist(user)
 
