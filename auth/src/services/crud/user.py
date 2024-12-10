@@ -12,6 +12,7 @@ from src.schemas.user import (
     UpdateUserSchema,
     ParticularUpdateUserSchema,
 )
+from src.utils.auth_utils import jwt_utils
 from src.utils.raising_http_excp import RaiseHttpException
 
 
@@ -19,7 +20,10 @@ async def create_user(
     user: CreateUserSchema,
     session: AsyncSession,
 ) -> User:
-    new_user = User(**user.model_dump())
+    new_user = User(
+        **user.model_dump(),
+        password=jwt_utils.hash_password(user.password),
+    )
     try:
         session.add(new_user)
         await session.commit()
