@@ -7,12 +7,16 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status, Path
 from src.models.user import User
 
-from src.schemas.user import CreateUser, UpdateUser, ParticularUpdateUser
+from src.schemas.user import (
+    CreateUserSchema,
+    UpdateUserSchema,
+    ParticularUpdateUserSchema,
+)
 from src.utils.raising_http_excp import RaiseHttpException
 
 
 async def create_user(
-    user: CreateUser,
+    user: CreateUserSchema,
     session: AsyncSession,
 ) -> User:
     new_user = User(**user.model_dump())
@@ -65,7 +69,7 @@ async def get_all_users(session: AsyncSession):
 async def update_user(
     session: AsyncSession,
     user: User,
-    user_schema: ParticularUpdateUser | UpdateUser,
+    user_schema: ParticularUpdateUserSchema | UpdateUserSchema,
     particular: bool = False,
 ) -> User:
     for key, value in user_schema.model_dump(exclude_unset=particular).items():

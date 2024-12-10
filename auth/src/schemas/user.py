@@ -1,30 +1,34 @@
-from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
 from src.schemas.base import BaseSchema
 
 
-class BaseUser(BaseSchema):
+class BaseUserSchema(BaseSchema):
     username: str
     email: EmailStr
 
 
-class ShowUser(BaseUser):
+class ShowUserSchema(BaseUserSchema):
     id: UUID
 
 
-class CreateUser(BaseUser):
+class CreateUserSchema(BaseUserSchema):
     password: str
 
 
-class UpdateUser(BaseUser):
+class UpdateUserSchema(BaseUserSchema):
     username: str
     email: EmailStr
     is_active: bool
 
 
-class ParticularUpdateUser(BaseModel):
+class ParticularUpdateUserSchema(BaseSchema):
     username: str | None = None
     email: EmailStr | None = None
     is_active: bool | None = None
+
+
+class UserLoginSchema(BaseSchema):
+    username: str
+    password: str
