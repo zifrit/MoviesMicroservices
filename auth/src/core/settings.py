@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-AUTH_BASE_DIR = Path(__file__).parent.parent
+AUTH_BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class DBSettings(BaseSettings):
@@ -22,20 +22,21 @@ class DBSettings(BaseSettings):
 class JWTSettings(BaseSettings):
     AUTH_PRIVATE_KEY_FILE: str
     AUTH_PUBLIC_KEY_FILE: str
-    CRYPTO_ALGORITHM: str = "RS256"
+    ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_MINUTES: int
 
     @property
     def jwt_private_key(self) -> Path:
-        return AUTH_BASE_DIR / "core/certs" / self.AUTH_PRIVATE_KEY_FILE
+        return AUTH_BASE_DIR / "src/core/certs" / self.AUTH_PRIVATE_KEY_FILE
 
     @property
     def jwt_public_key(self) -> Path:
-        return AUTH_BASE_DIR / "core/certs" / self.AUTH_PUBLIC_KEY_FILE
+        return AUTH_BASE_DIR / "src/core/certs" / self.AUTH_PUBLIC_KEY_FILE
 
 
 class Settings(BaseSettings):
+    PROJECT_TITLE: str = "auth"
     db_settings: DBSettings = DBSettings()
     jwt_settings: JWTSettings = JWTSettings()
 

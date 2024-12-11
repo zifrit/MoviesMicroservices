@@ -1,10 +1,13 @@
 from datetime import datetime, timezone
+from typing import Annotated
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status, Path
+from fastapi import HTTPException, status, Path, Depends
+
+from src.db.session import db_session
 from src.models.user import User
 
 from src.schemas.user import (
@@ -12,7 +15,7 @@ from src.schemas.user import (
     UpdateUserSchema,
     ParticularUpdateUserSchema,
 )
-from src.utils.auth_utils import jwt_utils
+from src.utils import auth_utils
 from src.utils.raising_http_excp import RaiseHttpException
 
 
@@ -21,8 +24,9 @@ async def create_user(
     session: AsyncSession,
 ) -> User:
     new_user = User(
-        **user.model_dump(),
-        password=jwt_utils.hash_password(user.password),
+        username=user.username,
+        password=auth_utils.jwt_utils.hash_password(user.password),
+        email=user.email,
     )
     try:
         session.add(new_user)
@@ -48,19 +52,28 @@ async def create_user(
     return new_user
 
 
-async def get_active_user_by_uuid(session: AsyncSession, uuid: UUID = Path()) -> User:
+async def get_active_user_by_uuid(
+    user_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(db_session.get_session),
+) -> User:
     user = await session.scalar(
-        select(User).where(User.id == uuid, User.is_active == True)
+        select(User).where(User.id == user_id, User.is_active == True)
     )
     return user if user else RaiseHttpException.check_is_exist(user)
 
 
-async def get_user_by_uuid(session: AsyncSession, uuid: UUID = Path()) -> User:
-    user = await session.scalar(select(User).where(User.id == uuid))
+async def get_user_by_uuid(
+    user_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(db_session.get_session),
+) -> User:
+    user = await session.scalar(select(User).where(User.id == user_id))
     return user if user else RaiseHttpException.check_is_exist(user)
 
 
-async def get_active_user_by_username(session: AsyncSession, username: str) -> User:
+async def get_active_user_by_username(
+    username: str,
+    session: AsyncSession,
+) -> User:
     user = await session.scalar(
         select(User).where(User.username == username, User.is_active == True)
     )
