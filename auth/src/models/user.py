@@ -2,10 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from typing import TYPE_CHECKING
 from sqlalchemy import String, Boolean
 from sqlalchemy.dialects.postgresql import BYTEA
-from src.models.base import Base
+from src.models.base import IdCUDMixin
 
 
-class User(Base):
+class User(IdCUDMixin):
     __tablename__ = "users"
     username: Mapped[str] = mapped_column(String(255), unique=True)
     email: Mapped[str] = mapped_column(String(255), unique=True)
