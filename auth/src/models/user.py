@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import BYTEA
 from src.models.base import IdCUDMixin, Base
 
 if TYPE_CHECKING:
-    from src.models.roles import Roles
+    from src.models.permissions import Roles
 
 
 class User(IdCUDMixin):
