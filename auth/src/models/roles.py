@@ -5,12 +5,19 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String, DateTime, ForeignKey, UniqueConstraint, func
 from src.models.base import Base, IdCUDMixin
 
+if TYPE_CHECKING:
+    from src.models.user import User
+
 
 class Roles(IdCUDMixin):
     __tablename__ = "roles"
     name: Mapped[str] = mapped_column(String(255), unique=True)
     role_permissions: Mapped[list["RolePermissions"]] = relationship(
         secondary="association_roles_role_permissions",
+        back_populates="roles",
+    )
+    users: Mapped[list["User"]] = relationship(
+        secondary="association_users_roles",
         back_populates="roles",
     )
 
