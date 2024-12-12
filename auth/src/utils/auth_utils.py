@@ -101,11 +101,16 @@ class JWTUtils:
         key: str = jwt_settings.jwt_public_key.read_text(),
         algorithm: str = jwt_settings.ALGORITHM,
     ):
-        encode = jwt.decode(
-            jwt=token,
-            key=key,
-            algorithms=[algorithm],
-        )
+        try:
+            encode = jwt.decode(
+                jwt=token,
+                key=key,
+                algorithms=[algorithm],
+            )
+        except jwt.InvalidTokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            )
         return encode
 
     @staticmethod
@@ -123,14 +128,9 @@ class AuthUtils:
         session: AsyncSession = Depends(db_session.get_session),
         token: HTTPAuthorizationCredentials = Depends(http_bearer),
     ):
-        try:
-            payload = JWTUtils.decode_token(token.credentials)
-        except jwt.InvalidTokenError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-            )
-        user = await crud_user.get_active_user_by_username(
-            payload["sub"], session=session
+        payload = JWTUtils.decode_token(token.credentials)
+        user = await crud_user.get_active_user_by_username_with_roles(
+            username=payload["sub"], session=session
         )
         if user:
             return user
