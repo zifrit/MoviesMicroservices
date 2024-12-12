@@ -20,7 +20,7 @@ async def validate_auth_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Username or password incorrect",
     )
-    user = await crud_user.get_active_user_by_username(
+    user = await crud_user.get_active_user_by_username_with_roles(
         session=session, username=login_user.username
     )
     if not user:

@@ -3,12 +3,14 @@ from typing import Annotated
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.orm import load_only, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status, Path, Depends
 
 from src.db.session import db_session
 from src.models.user import User
+from src.models.permissions import Roles
 
 from src.schemas.user import (
     CreateUserSchema,
@@ -70,12 +72,21 @@ async def get_user_by_uuid(
     return user if user else RaiseHttpException.check_is_exist(user)
 
 
-async def get_active_user_by_username(
+async def get_active_user_by_username_with_roles(
     username: str,
     session: AsyncSession,
 ) -> User:
     user = await session.scalar(
-        select(User).where(User.username == username, User.is_active == True)
+        select(User)
+        .options(
+            selectinload(User.roles).load_only(
+                Roles.id,
+                Roles.name,
+            ),
+        )
+        .where(
+            User.username == username, User.deleted_at.is_(None), User.is_active == True
+        )
     )
     return user if user else RaiseHttpException.check_is_exist(user)
 
