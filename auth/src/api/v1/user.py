@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status, Path
+from fastapi import APIRouter, Depends, Response, status, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.auth_utils import auth_utils
@@ -12,8 +12,12 @@ from src.schemas.user import (
     CreateUserSchema,
     ParticularUpdateUserSchema,
     UpdateUserSchema,
+    AddRoleToUserSchema,
+    ShowUserWithRolesSchema,
 )
 from src.services.crud import user as crud_user
+from src.services.crud import permissions as crud_permissions
+from src.utils.check_permissions import check_permissions
 import logging
 
 
@@ -27,7 +31,9 @@ logger = logging.getLogger(__name__)
     response_model=list[ShowUserSchema],
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
+@check_permissions("user")
 async def get_users(
+    request: Request,
     session: AsyncSession = Depends(db_session.get_session),
 ) -> list[User]:
     return await crud_user.get_active_users(session)
@@ -98,3 +104,31 @@ async def update_user(
         user_id=user_id,
         user_schema=user_schema,
     )
+
+
+@router.get(
+    "/{user_id}/roles",
+    response_model=ShowUserWithRolesSchema,
+    dependencies=[Depends(auth_utils.get_current_active_user)],
+)
+async def add_role_to_user(
+    user_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(db_session.get_session),
+) -> User:
+    return await crud_user.get_user_with_roles(user_id=user_id, session=session)
+
+
+@router.post(
+    "/{user_id}/add_role",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(auth_utils.get_current_active_user)],
+)
+async def add_role_to_user(
+    user_id: Annotated[UUID, Path],
+    role_id: AddRoleToUserSchema,
+    session: AsyncSession = Depends(db_session.get_session),
+) -> Response:
+    await crud_permissions.add_role_to_user(
+        user_id=user_id, role_id=role_id, session=session
+    )
+    return Response(status_code=status.HTTP_200_OK)

@@ -103,6 +103,28 @@ async def get_all_users(session: AsyncSession) -> list[User]:
     return list(users)
 
 
+async def get_user_with_roles(
+    user_id: UUID,
+    session: AsyncSession,
+) -> User:
+    user = await session.scalar(
+        select(User)
+        .options(
+            load_only(
+                User.id,
+                User.is_active,
+                User.deleted_at,
+            ),
+            selectinload(User.roles).load_only(
+                Roles.id,
+                Roles.name,
+            ),
+        )
+        .where(User.id == user_id, User.deleted_at.is_(None), User.is_active == True)
+    )
+    return user if user else RaiseHttpException.check_is_exist(user)
+
+
 async def update_user(
     session: AsyncSession,
     user_id: UUID,
