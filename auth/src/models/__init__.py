@@ -1,11 +1,11 @@
 __all__ = (
     "User",
     "Roles",
-    "RolePermissions",
+    "Permissions",
 )
 from src.models.user import User, AssociationUsersRoles
 from src.models.permissions import (
     Roles,
-    RolePermissions,
+    Permissions,
     AssociationRolesRolePermissions,
 )

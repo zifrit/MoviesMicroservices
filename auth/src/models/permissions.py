@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class Roles(IdCUDMixin):
     __tablename__ = "roles"
     name: Mapped[str] = mapped_column(String(255), unique=True)
-    role_permissions: Mapped[list["RolePermissions"]] = relationship(
-        secondary="association_roles_role_permissions",
+    role_permissions: Mapped[list["Permissions"]] = relationship(
+        secondary="association_roles_permissions",
         back_populates="roles",
     )
     users: Mapped[list["User"]] = relationship(
@@ -22,25 +22,25 @@ class Roles(IdCUDMixin):
     )
 
 
-class RolePermissions(IdCUDMixin):
-    __tablename__ = "role_permissions"
+class Permissions(IdCUDMixin):
+    __tablename__ = "permissions"
     name: Mapped[str] = mapped_column(String(255), unique=True)
     roles: Mapped[list["Roles"]] = relationship(
-        secondary="association_roles_role_permissions",
+        secondary="association_roles_permissions",
         back_populates="role_permissions",
     )
 
 
 class AssociationRolesRolePermissions(Base):
-    __tablename__ = "association_roles_role_permissions"
+    __tablename__ = "association_roles_permissions"
     __table_args__ = (
         UniqueConstraint(
-            "role_id", "role_permissions_id", name="idx_unique_roles_role_permissions"
+            "role_id", "permissions_id", name="idx_unique_roles_permissions"
         ),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
     role_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id"))
-    role_permissions_id: Mapped[UUID] = mapped_column(ForeignKey("role_permissions.id"))
+    permissions_id: Mapped[UUID] = mapped_column(ForeignKey("permissions.id"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
