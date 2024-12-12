@@ -63,8 +63,8 @@ async def get_active_user_by_uuid(
 
 
 async def get_user_by_uuid(
-    user_id: Annotated[UUID, Path],
-    session: AsyncSession = Depends(db_session.get_session),
+    user_id: UUID,
+    session: AsyncSession,
 ) -> User:
     user = await session.scalar(select(User).where(User.id == user_id))
     return user if user else RaiseHttpException.check_is_exist(user)
@@ -80,22 +80,25 @@ async def get_active_user_by_username(
     return user if user else RaiseHttpException.check_is_exist(user)
 
 
-async def get_active_users(session: AsyncSession):
-    return await session.scalars(
+async def get_active_users(session: AsyncSession) -> list[User]:
+    users = await session.scalars(
         select(User).where(User.is_active == True, User.deleted_at.is_(None))
     )
+    return list(users)
 
 
-async def get_all_users(session: AsyncSession):
-    return await session.scalars(select(User).where(User.deleted_at.is_(None)))
+async def get_all_users(session: AsyncSession) -> list[User]:
+    users = await session.scalars(select(User).where(User.deleted_at.is_(None)))
+    return list(users)
 
 
 async def update_user(
     session: AsyncSession,
-    user: User,
+    user_id: UUID,
     user_schema: ParticularUpdateUserSchema | UpdateUserSchema,
     particular: bool = False,
 ) -> User:
+    user = await get_active_user_by_uuid(user_id=user_id, session=session)
     for key, value in user_schema.model_dump(exclude_unset=particular).items():
         setattr(user, key, value)
     try:
@@ -120,7 +123,8 @@ async def update_user(
     return user
 
 
-async def delete_user(session: AsyncSession, user: User) -> None:
+async def delete_user(session: AsyncSession, user_id: UUID) -> None:
+    user = await get_user_by_uuid(user_id=user_id, session=session)
     user.is_active = False
     user.deleted_at = datetime.now(timezone.utc)
     await session.commit()

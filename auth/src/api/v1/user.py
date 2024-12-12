@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Response, status
+from typing import Annotated
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Response, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.auth_utils import auth_utils
@@ -24,18 +27,17 @@ logger = logging.getLogger(__name__)
     response_model=list[ShowUserSchema],
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
-async def get_user(
+async def get_users(
     session: AsyncSession = Depends(db_session.get_session),
-) -> [ShowUserSchema]:
-    result = await crud_user.get_active_users(session)
-    return result
+) -> list[User]:
+    return await crud_user.get_active_users(session)
 
 
 @router.post("/", response_model=ShowUserSchema, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user: CreateUserSchema,
     session: AsyncSession = Depends(db_session.get_session),
-):
+) -> User:
     return await crud_user.create_user(user, session)
 
 
@@ -45,9 +47,10 @@ async def create_user(
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_user(
-    user: ShowUserSchema = Depends(crud_user.get_active_user_by_uuid),
-) -> ShowUserSchema:
-    return user
+    user_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(db_session.get_session),
+) -> User:
+    return await crud_user.get_user_by_uuid(session=session, user_id=user_id)
 
 
 @router.delete(
@@ -56,10 +59,10 @@ async def get_user(
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def delete_user(
-    user: User = Depends(crud_user.get_user_by_uuid),
+    user_id: Annotated[UUID, Path],
     session: AsyncSession = Depends(db_session.get_session),
-):
-    await crud_user.delete_user(session, user)
+) -> Response:
+    await crud_user.delete_user(session=session, user_id=user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -71,11 +74,11 @@ async def delete_user(
 )
 async def partial_update_user(
     user_schema: ParticularUpdateUserSchema,
-    user: User = Depends(crud_user.get_active_user_by_uuid),
+    user_id: Annotated[UUID, Path],
     session: AsyncSession = Depends(db_session.get_session),
-):
+) -> User:
     return await crud_user.update_user(
-        session=session, user=user, user_schema=user_schema, particular=True
+        session=session, user_id=user_id, user_schema=user_schema, particular=True
     )
 
 
@@ -87,11 +90,11 @@ async def partial_update_user(
 )
 async def update_user(
     user_schema: UpdateUserSchema,
-    user: User = Depends(crud_user.get_active_user_by_uuid),
+    user_id: Annotated[UUID, Path],
     session: AsyncSession = Depends(db_session.get_session),
-):
+) -> User:
     return await crud_user.update_user(
         session=session,
-        user=user,
+        user_id=user_id,
         user_schema=user_schema,
     )
