@@ -34,3 +34,4 @@ suren/core/jwt-public.pem
 /db.sqlite3
 /auth/src/core/certs/jwt-private.pem
 /auth/src/core/certs/jwt-public.pem
+/movies/src/core/certs/jwt-public.pem
