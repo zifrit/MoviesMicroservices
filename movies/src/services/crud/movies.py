@@ -13,7 +13,7 @@ from src.services.crud.base import ModelManager
 from src.models.movies import Movie
 
 
-class TaskManager(
+class MoviesManager(
     ModelManager[
         Movie,
         ShowMovieSchema,
@@ -25,7 +25,7 @@ class TaskManager(
     pass
 
 
-crud_movies = TaskManager(Movie)
+crud_movies = MoviesManager(Movie)
 
 
 async def user_movies(
