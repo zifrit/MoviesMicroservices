@@ -25,10 +25,10 @@ class TaskManager(
     pass
 
 
-crud_task = TaskManager(Movie)
+crud_movies = TaskManager(Movie)
 
 
-async def get_user_movies(
+async def user_movies(
     user_id: UUID,
     session: AsyncSession,
     page_size: int,
