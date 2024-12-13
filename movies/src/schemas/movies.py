@@ -6,11 +6,14 @@ from src.schemas.base import BaseSchema
 class MovieSchema(BaseSchema):
     name: str
     description: str
-    user_id: UUID
 
 
 class CreateMovieSchema(MovieSchema):
     pass
+
+
+class CreateMovieWithUserIDSchema(MovieSchema):
+    user_id: UUID
 
 
 class ShowMovieSchema(MovieSchema):
@@ -24,4 +27,3 @@ class UpdateMovieSchema(MovieSchema):
 class PartialUpdateMovieSchema(MovieSchema):
     name: str | None
     description: str | None
-    user_id: UUID | None
