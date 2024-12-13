@@ -25,7 +25,7 @@ class JWTSettings(BaseSettings):
 
     @property
     def jwt_public_key(self) -> Path:
-        return MOVIES_BASE_DIR / "src/core/certs" / self.AUTH_PUBLIC_KEY_FILE
+        return MOVIES_BASE_DIR / "src/core/certs" / self.MOVIES_PUBLIC_KEY_FILE
 
 
 class Settings(BaseSettings):
