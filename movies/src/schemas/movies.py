@@ -18,6 +18,7 @@ class CreateMovieWithUserIDSchema(MovieSchema):
 
 class ShowMovieSchema(MovieSchema):
     id: UUID
+    user_id: UUID
 
 
 class UpdateMovieSchema(MovieSchema):
