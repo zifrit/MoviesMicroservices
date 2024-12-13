@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 @router.get(
     "/",
     response_model=list[ShowUserSchema],
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 @check_permissions(["user"])
@@ -39,7 +40,11 @@ async def get_users(
     return await crud_user.get_active_users(session)
 
 
-@router.post("/", response_model=ShowUserSchema, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=ShowUserSchema,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_user(
     user: CreateUserSchema,
     session: AsyncSession = Depends(db_session.get_session),
@@ -50,6 +55,7 @@ async def create_user(
 @router.get(
     "/{user_id}",
     response_model=ShowUserSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_user(

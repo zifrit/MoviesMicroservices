@@ -26,6 +26,7 @@ router = APIRouter()
 @router.post(
     "/",
     response_model=ShowRoleSchema,
+    status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def create_role(
@@ -38,6 +39,7 @@ async def create_role(
 @router.get(
     "/",
     response_model=list[ShowRoleSchema],
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_role(
@@ -49,6 +51,7 @@ async def get_role(
 @router.get(
     "/permissions",
     response_model=list[ShowPermissionSchema],
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_permissions(
@@ -60,6 +63,7 @@ async def get_permissions(
 @router.get(
     "/{role_id}",
     response_model=ShowRoleSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_role(
@@ -72,6 +76,7 @@ async def get_role(
 @router.put(
     "/{role_id}",
     response_model=ShowRoleSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def update_role(
@@ -89,6 +94,7 @@ async def update_role(
 @router.patch(
     "/{role_id}",
     response_model=ShowRoleSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def update_role(
@@ -103,6 +109,7 @@ async def update_role(
 
 @router.delete(
     "/{role_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def delete_role(
@@ -115,6 +122,7 @@ async def delete_role(
 
 @router.post(
     "/{role_id}/add_permissions",
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def add_permission_to_role(
@@ -131,6 +139,7 @@ async def add_permission_to_role(
 @router.get(
     "/{role_id}/permissions",
     response_model=ShowRolePermissionsSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_role_permissions(
@@ -143,6 +152,7 @@ async def get_role_permissions(
 @router.post(
     "/permissions",
     response_model=ShowPermissionSchema,
+    status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def create_permissions(
@@ -157,6 +167,7 @@ async def create_permissions(
 @router.get(
     "/permissions/{permission_id}",
     response_model=ShowPermissionSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def get_permission(
@@ -171,6 +182,7 @@ async def get_permission(
 @router.put(
     "/permissions/{permission_id}",
     response_model=ShowPermissionSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def update_permissions(
@@ -188,6 +200,7 @@ async def update_permissions(
 @router.patch(
     "/permissions/{permission_id}",
     response_model=ShowPermissionSchema,
+    status_code=status.HTTP_200_OK,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def update_permissions(
@@ -205,6 +218,7 @@ async def update_permissions(
 
 @router.delete(
     "/permissions/{permission_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
 async def delete_permissions(
