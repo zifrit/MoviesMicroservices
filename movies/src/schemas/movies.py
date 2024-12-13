@@ -12,6 +12,10 @@ class CreateMovieSchema(MovieSchema):
     pass
 
 
+class CreateMovieWithUserIDSchema(MovieSchema):
+    user_id: UUID
+
+
 class ShowMovieSchema(MovieSchema):
     id: UUID
 

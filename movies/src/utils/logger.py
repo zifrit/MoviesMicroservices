@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from src.core.settings import AUTH_BASE_DIR
+from src.core.settings import MOVIES_BASE_DIR
 
 LOG_DEFAULT_HANDLERS = [
     "filehandler",
@@ -47,7 +47,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "verbose",
-            "filename": os.path.join(AUTH_BASE_DIR, "logs", "logs.log"),
+            "filename": os.path.join(MOVIES_BASE_DIR, "logs", "logs.log"),
             "mode": "a",
             "backupCount": 3,
             "maxBytes": 50000,
