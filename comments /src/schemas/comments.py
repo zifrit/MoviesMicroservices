@@ -5,7 +5,7 @@ from src.schemas.base import BaseSchema
 
 class CommentsSchema(BaseSchema):
     text: str
-    object_id: str
+    object_id: UUID
 
 
 class CreateCommentsSchema(CommentsSchema):
@@ -26,5 +26,5 @@ class UpdateCommentsSchema(CommentsSchema):
 
 
 class PartialUpdateCommentsSchema(CommentsSchema):
-    text: str | None
-    object_id: str | None
+    text: str | None = None
+    object_id: str | None = None

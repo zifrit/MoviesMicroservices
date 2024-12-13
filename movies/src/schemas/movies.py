@@ -26,5 +26,5 @@ class UpdateMovieSchema(MovieSchema):
 
 
 class PartialUpdateMovieSchema(MovieSchema):
-    name: str | None
-    description: str | None
+    name: str | None = None
+    description: str | None = None
