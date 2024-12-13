@@ -35,3 +35,4 @@ suren/core/jwt-public.pem
 /auth/src/core/certs/jwt-private.pem
 /auth/src/core/certs/jwt-public.pem
 /movies/src/core/certs/jwt-public.pem
+/comments /src/core/certs/jwt-public.pem
