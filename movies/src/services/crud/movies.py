@@ -1,3 +1,8 @@
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.schemas.movies import (
     CreateMovieSchema,
     ShowMovieSchema,
@@ -24,6 +29,13 @@ crud_task = TaskManager(Movie)
 
 
 async def get_user_movies(
-    user_id: int,
+    user_id: UUID,
+    session: AsyncSession,
+    page_size: int,
+    page_number: int,
 ) -> list[Movie]:
-    pass
+    page_from = page_size * (page_number - 1)
+    movies = await session.scalars(
+        select(Movie).where(Movie.user_id == user_id).offset(page_from).limit(page_size)
+    )
+    return list(movies)
