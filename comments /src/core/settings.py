@@ -35,4 +35,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-print(settings.db_settings.auth_async_database_url)
