@@ -14,6 +14,7 @@ async def login(
     payload = {
         "sub": user.username,
         "roles": [RolesSchema.model_validate(role).name for role in user.roles],
+        "user_id": str(user.id),
     }
     access_token, refresh_token = jwt_utils.create_jwt_token(payload=payload)
     return {
