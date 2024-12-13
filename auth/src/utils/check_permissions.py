@@ -4,7 +4,7 @@ from typing import Callable
 from src.utils.auth_utils import jwt_utils
 
 
-def check_permissions(required_role: str):
+def check_permissions(required_roles: list):
     def decorator(endpoint: Callable):
         @wraps(endpoint)
         async def wrapper(*args, **kwargs):
@@ -24,9 +24,9 @@ def check_permissions(required_role: str):
 
             token = auth_header.split(" ")[1]
             payload = jwt_utils.decode_token(token)
-            user_role = payload.get("roles")
+            user_roles = payload.get("roles")
 
-            if required_role not in user_role:
+            if sum([role in user_roles for role in required_roles]) < 1:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Access forbidden: insufficient permissions",

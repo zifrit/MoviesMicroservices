@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
     response_model=list[ShowUserSchema],
     dependencies=[Depends(auth_utils.get_current_active_user)],
 )
-@check_permissions("user")
+@check_permissions(["user"])
 async def get_users(
     request: Request,
     session: AsyncSession = Depends(db_session.get_session),
