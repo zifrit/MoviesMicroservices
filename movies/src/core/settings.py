@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-AUTH_BASE_DIR = Path(__file__).parent.parent.parent
+MOVIES_BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class DBSettings(BaseSettings):
@@ -25,7 +25,7 @@ class JWTSettings(BaseSettings):
 
     @property
     def jwt_public_key(self) -> Path:
-        return AUTH_BASE_DIR / "src/core/certs" / self.AUTH_PUBLIC_KEY_FILE
+        return MOVIES_BASE_DIR / "src/core/certs" / self.AUTH_PUBLIC_KEY_FILE
 
 
 class Settings(BaseSettings):
