@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from src.utils.logger import LOGGING
 from src.core.settings import settings
+from src.api.v1 import comments
 
 app = FastAPI(
     title=settings.PROJECT_TITLE,
@@ -11,6 +12,7 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
+app.include_router(comments.router, prefix="/api/comments", tags=["comments"])
 
 if __name__ == "__main__":
     uvicorn.run(
