@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter
 
 from src.services.validate_auth_user import validate_auth_user
-from src.utils.auth_utils import jwt_utils
+from src.utils.auth_utils import auth_utils
 from src.schemas.permissions import RolesSchema
 
 router = APIRouter()
@@ -16,7 +16,7 @@ async def login(
         "roles": [RolesSchema.model_validate(role).name for role in user.roles],
         "user_id": str(user.id),
     }
-    access_token, refresh_token = jwt_utils.create_jwt_token(payload=payload)
+    access_token, refresh_token = await auth_utils.create_jwt_token(payload=payload)
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,

@@ -1,7 +1,7 @@
 from functools import wraps
 from fastapi import HTTPException, status, Request
 from typing import Callable
-from src.utils.auth_utils import jwt_utils
+from src.utils.auth_utils import auth_utils
 
 
 def check_permissions(required_roles: list):
@@ -23,7 +23,7 @@ def check_permissions(required_roles: list):
                 )
 
             token = auth_header.split(" ")[1]
-            payload = jwt_utils.decode_token(token)
+            payload = await auth_utils.decode_token(token)
             user_roles = payload.get("roles")
 
             if sum([role in user_roles for role in required_roles]) < 1:

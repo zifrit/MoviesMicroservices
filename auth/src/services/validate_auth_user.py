@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from src.db.session import db_session
 from src.schemas.user import UserLoginSchema
-from src.utils.auth_utils import jwt_utils
+from src.utils.auth_utils import auth_utils
 from src.services.crud import user as crud_user
 
 router = APIRouter()
@@ -25,6 +25,6 @@ async def validate_auth_user(
     )
     if not user:
         raise unauthed_exception
-    if not (jwt_utils.check_password(login_user.password, user.password)):
+    if not (auth_utils.check_password(login_user.password, user.password)):
         raise unauthed_exception
     return user
