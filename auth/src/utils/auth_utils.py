@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import bcrypt
 import jwt
-from src.core.settings import settings, JWTSettings
+from src.core.settings import settings
 from src.db.redis import RedisCache, get_redis
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -43,13 +43,13 @@ class AuthUtils:
             exp = now + access_expires_delta
         else:
             exp = now + timedelta(minutes=access_expire_minutes)
-        access_payload.update(
-            exp=exp,
-            iat=now,
-            type="access_token",
-            jti_refresh=jti_refresh,
-            jti_access=jti_access,
-        )
+            access_payload.update(
+                exp=exp,
+                iat=now,
+                type="access_token",
+                jti_refresh=jti_refresh,
+                jti_access=jti_access,
+            )
 
         if refresh_expires_delta:
             exp = now + refresh_expires_delta
@@ -60,6 +60,7 @@ class AuthUtils:
             iat=now,
             type="refresh_token",
             jti_refresh=jti_refresh,
+            jti_access=jti_access,
         )
 
         access_token = jwt.encode(
@@ -77,10 +78,10 @@ class AuthUtils:
     @staticmethod
     async def refreshed_jwt_token(
         token: str,
-        cache: RedisCache = Depends(get_redis),
-        session: AsyncSession = Depends(db_session.get_session),
+        cache: RedisCache,
+        session: AsyncSession,
     ) -> tuple[str, str]:
-        decoded_token = await AuthUtils.decode_token(token=token)
+        decoded_token = await AuthUtils.decode_token(token=token, cache=cache)
         if decoded_token["type"] != "refresh_token":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -90,7 +91,7 @@ class AuthUtils:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Token is in black list"
             )
-
+        await AuthUtils.logout(token=token, cache=cache)
         user: User = await crud_user.get_active_user_by_username_with_roles(
             username=decoded_token["sub"], session=session
         )
@@ -103,10 +104,10 @@ class AuthUtils:
 
     @staticmethod
     async def decode_token(
+        cache: RedisCache,
         token: str | bytes,
         key: str = jwt_settings.jwt_public_key.read_text(),
         algorithm: str = jwt_settings.ALGORITHM,
-        cache: RedisCache = Depends(get_redis),
     ) -> dict:
         try:
             encode = jwt.decode(
@@ -114,7 +115,9 @@ class AuthUtils:
                 key=key,
                 algorithms=[algorithm],
             )
-            if await cache.get(encode["access_token"]):
+            if await cache.get(encode["jti_access"]) or await cache.get(
+                encode["jti_refresh"]
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Token is in black list",
@@ -137,8 +140,9 @@ class AuthUtils:
     async def get_current_active_user(
         session: AsyncSession = Depends(db_session.get_session),
         token: HTTPAuthorizationCredentials = Depends(http_bearer),
+        cache: RedisCache = Depends(get_redis),
     ) -> User:
-        payload = await AuthUtils.decode_token(token.credentials)
+        payload = await AuthUtils.decode_token(token=token.credentials, cache=cache)
         if payload["type"] != "access_token":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -152,6 +156,29 @@ class AuthUtils:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
+        )
+
+    @staticmethod
+    async def logout(
+        cache: RedisCache,
+        token: str,
+    ) -> None:
+        payload = await AuthUtils.decode_token(token=token, cache=cache)
+        refresh_cache_ttl = timedelta(
+            minutes=jwt_settings.REFRESH_TOKEN_EXPIRE_MINUTES
+        ) + timedelta(minutes=1)
+        access_cache_ttl = timedelta(
+            minutes=jwt_settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        ) + timedelta(minutes=1)
+        await cache.put(
+            key=payload["jti_refresh"],
+            value=payload["sub"],
+            cache_time=int(refresh_cache_ttl.total_seconds()),
+        )
+        await cache.put(
+            key=payload["jti_access"],
+            value=payload["sub"],
+            cache_time=int(access_cache_ttl.total_seconds()),
         )
 
 
