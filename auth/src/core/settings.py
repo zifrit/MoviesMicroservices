@@ -35,10 +35,16 @@ class JWTSettings(BaseSettings):
         return AUTH_BASE_DIR / "src/core/certs" / self.AUTH_PUBLIC_KEY_FILE
 
 
+class RedisSettings(BaseSettings):
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+
+
 class Settings(BaseSettings):
     PROJECT_TITLE: str = "auth"
     db_settings: DBSettings = DBSettings()
     jwt_settings: JWTSettings = JWTSettings()
+    redis_settings: RedisSettings = RedisSettings()
 
 
 settings = Settings()
