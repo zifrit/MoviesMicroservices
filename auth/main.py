@@ -25,14 +25,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.PROJECT_TITLE,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url="/auth/api/openapi",
+    openapi_url="/auth/api/openapi.json",
     lifespan=lifespan,
 )
 
-app.include_router(user.router, prefix="/api/users", tags=["users"])
-app.include_router(login.router, prefix="/api/auth", tags=["login"])
-app.include_router(permissions.router, prefix="/api/roles", tags=["roles"])
+app.include_router(user.router, prefix="/auth/api/users", tags=["users"])
+app.include_router(login.router, prefix="/auth/api", tags=["login"])
+app.include_router(permissions.router, prefix="/auth/api/roles", tags=["roles"])
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ async def create_user(
 ) -> User:
     new_user = User(
         username=user.username,
-        password=auth_utils.jwt_utils.hash_password(user.password),
+        password=auth_utils.auth_utils.hash_password(user.password),
         email=user.email,
     )
     try:
