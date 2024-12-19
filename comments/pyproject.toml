@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "comments "
+name = "comments"
 version = "0.1.0"
 description = ""
 authors = ["zifrit <zifrit@list.ru>"]
