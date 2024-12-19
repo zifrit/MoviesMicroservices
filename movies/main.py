@@ -8,11 +8,11 @@ from src.api.v1 import movies
 
 app = FastAPI(
     title=settings.PROJECT_TITLE,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url="/movies/api/openapi",
+    openapi_url="/movies/api/openapi.json",
 )
 
-app.include_router(movies.router, prefix="/api/movies", tags=["movies"])
+app.include_router(movies.router, prefix="/movies/api", tags=["movies"])
 
 if __name__ == "__main__":
     uvicorn.run(

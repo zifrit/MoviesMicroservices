@@ -8,11 +8,11 @@ from src.api.v1 import comments
 
 app = FastAPI(
     title=settings.PROJECT_TITLE,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url="/comments/api/openapi",
+    openapi_url="/comments/api/openapi.json",
 )
 
-app.include_router(comments.router, prefix="/api/comments", tags=["comments"])
+app.include_router(comments.router, prefix="/comments/api", tags=["comments"])
 
 if __name__ == "__main__":
     uvicorn.run(
